@@ -11,12 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load packages
 
-
 ```{r packages}
 library(googlesheets4)
 ```
 
-## Read Data
+## Read data
 
 Read in data from Google Sheet.
 
