@@ -1,0 +1,27 @@
+---
+title: "Boston Water Fountain Locations"
+author: "Julia Vasta"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+
+
+```{r packages}
+library(googlesheets4)
+```
+
+## Read Data
+
+Read in data from Google Sheet.
+
+```{r read_data}
+sheet <- read_sheet("https://docs.google.com/spreadsheets/d/1KuzKNWn-ZxbhKwkdaj1CnzyqsKN6Pxm1HxoNpTqErhM/edit?resourcekey=&gid=729659319#gid=729659319")
+```
+
+
