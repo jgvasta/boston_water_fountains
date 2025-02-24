@@ -17,6 +17,7 @@ library(sf)
 library(leaflet)
 library(stringr)
 library(dplyr)
+library(tidyr)
 library(lubridate)
 ```
 
@@ -32,9 +33,18 @@ df <- read_sheet("https://docs.google.com/spreadsheets/d/1KuzKNWn-ZxbhKwkdaj1Cnz
 
 ```{r transform}
 # Rename columns
-df <- df %>%
+df <- 
+    df %>%
     rename("timestamp" = 1, "coords" = 2, "name" = 3, "is_working" = 4,
            "descr" = 5, "photo" = 6)
+
+# Convert timestamp column to date-time object
+df$timestamp <- df$timestamp %>%
+    ymd_hms()
+
+# Split coordinates into x and y columns
+df <- df %>%
+    separate(coords, into = c("y", "x"), sep = ", ", convert = TRUE)
 ```
 
 
