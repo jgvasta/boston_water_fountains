@@ -76,6 +76,12 @@ print(st_crs(points$geometry))
 shp_fountains <- read_sf("fountains.shp")
 ```
 
+```{r}
+## Browse the basemap options
+names(providers)
+```
+
+
 ```{r, map}
 
 basemap <- leaflet() %>%
@@ -123,8 +129,10 @@ basemap <- leaflet() %>%
 
 ```{r}
 leaflet(shp_fountains) %>%
-    addProviderTiles("OpenStreetMap") %>%
-    addMarkers(df$long, df$lat, popup = df$fountain_name)
+    addProviderTiles("CartoDB.Positron") %>%
+    # addProviderTiles("OpenStreetMap") %>%
+    addMarkers(popup = ~fntn_nm) %>%
+    addCircles()
 ```
 
 
