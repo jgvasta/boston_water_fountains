@@ -19,6 +19,7 @@ library(stringr)
 library(dplyr)
 library(tidyr)
 library(lubridate)
+library(sf)
 ```
 
 ## Read data
@@ -50,5 +51,18 @@ head(df)
 ```
 
 ## Prep for mapping
+
+```{r create_sf_object, warning=FALSE}
+# Create sf object out of df
+points <- st_as_sf(df, coords = c("x","y"))
+
+# Set coordinate system to WGS84
+st_crs(points$geometry) <- 4326
+print(st_crs(points$geometry))
+
+# Write to shapefile
+st_write(points, "fountains.shp")
+```
+
 
 
