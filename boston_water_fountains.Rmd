@@ -6,12 +6,14 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Load packages
 
 ```{r packages, message=FALSE}
+
 library(googlesheets4)
 library(sf)
 library(leaflet)
@@ -27,25 +29,26 @@ library(sf)
 Read in data from Google Sheet.
 
 ```{r read_data, message=FALSE}
+
 df <- read_sheet("https://docs.google.com/spreadsheets/d/1KuzKNWn-ZxbhKwkdaj1CnzyqsKN6Pxm1HxoNpTqErhM/edit?resourcekey=&gid=729659319#gid=729659319")
 ```
 
 ## Transform data
 
 ```{r transform}
-# Rename columns
+
+## Rename columns
 df <- 
     df %>%
-    rename("timestamp" = 1, "coords" = 2, "name" = 3, "is_working" = 4,
-           "descr" = 5, "photo" = 6)
+    rename("timestamp" = 1, "coords" = 2, "fountain_name" = 3, "is_working" = 4, "descr" = 5, "photo" = 6, "submitter_name" = 7)
 
-# Convert timestamp column to date-time object
+## Convert timestamp column to date-time object
 df$timestamp <- df$timestamp %>%
     ymd_hms()
 
-# Split coordinates into x and y columns
+## Split coordinates into x and y columns
 df <- df %>%
-    separate(coords, into = c("y", "x"), sep = ", ", convert = TRUE)
+    separate(coords, into = c("lat", "long"), sep = ", ", convert = TRUE)
 
 head(df)
 ```
@@ -53,16 +56,75 @@ head(df)
 ## Prep for mapping
 
 ```{r create_sf_object, warning=FALSE}
-# Create sf object out of df
-points <- st_as_sf(df, coords = c("x","y"))
 
-# Set coordinate system to WGS84
+## Create sf object out of df
+points <- st_as_sf(df, coords = c("long","lat"))
+
+## Set coordinate system to WGS84
 st_crs(points$geometry) <- 4326
 print(st_crs(points$geometry))
 
-# Write to shapefile
-st_write(points, "fountains.shp")
+## Write to shapefile
+# st_write(points, "fountains.shp")
 ```
 
+## Map fountains
+
+```{r, fountains_import}
+
+## Import the shapefile we created
+shp_fountains <- read_sf("fountains.shp")
+```
+
+```{r, map}
+
+basemap <- leaflet() %>%
+  # add different provider tiles
+  addProviderTiles(
+    "OpenStreetMap",
+    # give the layer a name
+    group = "OpenStreetMap"
+  ) %>%
+  addProviderTiles(
+    "Stamen.Toner",
+    group = "Stamen.Toner"
+  ) %>%
+  addProviderTiles(
+    "Stamen.Terrain",
+    group = "Stamen.Terrain"
+  ) %>%
+  addProviderTiles(
+    "Esri.WorldStreetMap",
+    group = "Esri.WorldStreetMap"
+  ) %>%
+  addProviderTiles(
+    "Wikimedia",
+    group = "Wikimedia"
+  ) %>%
+  addProviderTiles(
+    "CartoDB.Positron",
+    group = "CartoDB.Positron"
+  ) %>%
+  addProviderTiles(
+    "Esri.WorldImagery",
+    group = "Esri.WorldImagery"
+  ) %>%
+# add a layers control
+  addLayersControl(
+    baseGroups = c(
+      "OpenStreetMap", "Stamen.Toner",
+      "Stamen.Terrain", "Esri.WorldStreetMap",
+      "Wikimedia", "CartoDB.Positron", "Esri.WorldImagery"
+    ),
+    # position it on the topleft
+    position = "topleft"
+  )
+```
+
+```{r}
+leaflet(shp_fountains) %>%
+    addProviderTiles("OpenStreetMap") %>%
+    addMarkers(df$long, df$lat, popup = df$fountain_name)
+```
 
 
