@@ -127,9 +127,10 @@ basemap <- leaflet() %>%
   )
 ```
 
-```{r}
+```{r leaflet}
+
 leaflet(shp_fountains) %>%
-    addProviderTiles("CartoDB.Positron") %>%
+    addProviderTiles("MapTilesAPI") %>%
     # addProviderTiles("OpenStreetMap") %>%
     addMarkers(popup = ~fntn_nm) %>%
     addCircles()
